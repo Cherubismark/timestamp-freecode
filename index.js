@@ -23,36 +23,33 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-// Timestamp Microservice API endpoint
-app.get('/api/timestamp/:dateParam?', (req, res) => {
-  let { dateParam } = req.params;
+// Timestamp Microservice API endpoint (replaced routing as requested)
+app.get('/api/:date?', (req, res) => {
+  let { date } = req.params;
 
-  // If no dateParam, return current time
-  if (!dateParam) {
+  // If no date parameter, return current time
+  if (!date) {
     const now = new Date();
     return res.json({ unix: now.getTime(), utc: now.toUTCString() });
   }
 
-  // If dateParam is a number string, parse it as integer (unix timestamp in milliseconds)
-  if (!isNaN(dateParam)) {
-    dateParam = parseInt(dateParam);
+  // If date is a number string (only digits), parse it as integer (unix timestamp in milliseconds)
+  if (/^\d+$/.test(date)) {
+    date = parseInt(date);
   }
 
-  const date = new Date(dateParam);
+  const parsedDate = new Date(date);
 
   // Check if date is valid
-  if (date.toString() === 'Invalid Date') {
+  if (parsedDate.toString() === 'Invalid Date') {
     return res.json({ error: 'Invalid Date' });
   }
 
   // Return the JSON response
-  res.json({ unix: date.getTime(), utc: date.toUTCString() });
+  res.json({ unix: parsedDate.getTime(), utc: parsedDate.toUTCString() });
 });
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
-
-
-
